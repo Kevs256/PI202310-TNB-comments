@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
-//import reportsRouter from './router/reports.router.js';
+import commentsRouter from 'router/comments.router';
 
 class Server{
 
@@ -26,7 +26,7 @@ class Server{
     }
 
     private routes(){
-        //this.app.use(cardsRouter.router);
+        this.app.use(commentsRouter.router);
 
     }
 
