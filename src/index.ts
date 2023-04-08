@@ -1,8 +1,11 @@
 import dotenv from 'dotenv';
+
+dotenv.config();
+
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
-import commentsRouter from 'router/comments.router';
+import commentsRouter from './router/comments.router';
 
 class Server{
 
@@ -16,7 +19,6 @@ class Server{
     }
 
     private config(){
-        dotenv.config();
         this.app.use(cors({
             origin: process.env.CLIENT_HOST! || '*',
             credentials: true

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import commentController from "../controllers/comment.controller.js";0
+import commentController from "../controllers/comment.controller.js";
 import upload from "../middlewares/image.save.js";
 
 class CommentsRouter {

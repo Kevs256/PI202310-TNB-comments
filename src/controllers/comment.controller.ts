@@ -14,6 +14,7 @@ const createComment = async (req: Request, res: Response, next: NextFunction) =>
     const mes: number = fechaActual.getMonth() + 1; 
     const anio: number = fechaActual.getFullYear();
     const fechaFormateada: string = `${dia}/${mes}/${anio}`;
+    
     console.log(fechaFormateada);
 
     try {
