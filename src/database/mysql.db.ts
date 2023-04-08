@@ -9,4 +9,4 @@ const sequelize = new Sequelize('mydb', process.env.MYSQL_USER!, process.env.MYS
 
 sequelize.authenticate().then(()=>{console.log("Mysql connected")});
 
-export default sequelize;
+export default sequelize; 
