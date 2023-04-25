@@ -12,9 +12,9 @@ class CommentsRouter {
     }
 
     private config(){
-        this.router.route('/product/:id_producto/comments').get(commentController.getAllComment);
+        this.router.route('/product/:id_producto').get(commentController.getAllComment);
+        this.router.route('/product/:id_producto').post(upload.array("comment_images"), commentController.createComment);
         this.router.route('/image/:id_comment').get(commentController.getCommentImage);
-        this.router.route('/product/:id_producto/comments').post(upload.array("comment_images"), commentController.createComment);
     }
 }
 

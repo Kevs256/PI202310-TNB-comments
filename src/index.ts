@@ -28,7 +28,7 @@ class Server{
     }
 
     private routes(){
-        this.app.use(commentsRouter.router);
+        this.app.use('/comments', commentsRouter.router);
 
     }
 
