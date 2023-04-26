@@ -19,17 +19,17 @@ const createComment = async (req: Request, res: Response, next: NextFunction) =>
 
     try {
         const { id_usuario, comentario, valoracion } = req.body;
-        const { id_producto } = req.params;
+        const { id_product } = req.params;
         var commentSeccion = await commentSeccionModel.findOne({
             where: {
-                Producto_id_producto: id_producto,
+                Producto_id_producto: id_product,
                 Usuario_id_usuario: id_usuario,
             }
         });
         if (!commentSeccion) {
             commentSeccion = await commentSeccionModel.create({
                 Usuario_id_usuario: id_usuario,
-                Producto_id_producto: id_producto,
+                Producto_id_producto: id_product,
                 Valoracion: valoracion,
             });
         }
@@ -75,9 +75,9 @@ const getCommentImage = async (req: Request, res: Response, next: NextFunction) 
 
 const getAllComment = async (req: Request, res: Response, next: NextFunction) => {
 
-    const { id_producto } = req.params;
+    const { id_product } = req.params;
     try {
-        const seccioncomments = await sequelize.query('CALL get_comments(:_id_seccion_comentario)', { replacements: { _id_seccion_comentario: id_producto } });
+        const seccioncomments = await sequelize.query('CALL get_comments(:_id_seccion_comentario)', { replacements: { _id_seccion_comentario: id_product } });
         if (seccioncomments) {
             res.status(200).json({ error: 0, status: true, comments: seccioncomments });
         } else {
@@ -99,12 +99,18 @@ const editComment = async (req: Request, res: Response, next: NextFunction) => {
     const fechaFormateada: string = `${dia}/${mes}/${anio}`;
 
     try {
-        const { id_usuario, comentario, valoracion } = req.body;
-        const { id_producto, id_comentario } = req.params;
+        const { id_usuario, comentario } = req.body;
+        const { id_product, id_comment } = req.params;
+
+        console.log(`id_product ${id_product}`);
+
+        if (!id_product || !id_comment) {
+            return res.status(400).json({ status: false, message: 'Missing required parameter(s)' });
+        }
 
         const commentSeccion = await commentSeccionModel.findOne({
             where: {
-                Producto_id_producto: id_producto,
+                Producto_id_producto: id_product,
                 Usuario_id_usuario: id_usuario,
             }
         });
@@ -115,7 +121,7 @@ const editComment = async (req: Request, res: Response, next: NextFunction) => {
 
         const commentdetails = await commentdetailsModel.findOne({
             where: {
-                id_detalles_comentario: id_comentario,
+                id_detalles_comentario: id_comment,
                 Seccion_Comentario_id_comentario: commentSeccion.id_seccion_comentario!
             }
         });
@@ -126,17 +132,17 @@ const editComment = async (req: Request, res: Response, next: NextFunction) => {
 
         commentdetails.comentario = comentario;
         commentdetails.fecha_comentario = fechaFormateada;
-        commentSeccion.Valoracion = valoracion;
 
         await commentdetails.save();
         await commentSeccion.save();
 
         res.status(200).json({ status: true });
     } catch (error) {
-        console.log(error),
-            res.status(500).json({ status: false, message: 'Server internal error' });
+        console.error(error);
+        res.status(500).json({ status: false, message: 'Server internal error' });
     }
 }
+
 
 
 const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
