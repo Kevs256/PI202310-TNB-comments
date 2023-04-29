@@ -2,9 +2,9 @@ import Express, { Request, Response, NextFunction } from "express";
 import path from "path";
 import fs from "fs";
 import sequelize from "../database/mysql.db.js";
-import commentSeccionModel from "../models/commentsection.model.js";
-import commentdetailsModel from "../models/commentdetails.model.js";
-import commentimageModel from "../models/commentimage.model.js";
+import commentSeccionModel from "../models/comment-products.model.js";
+import commentdetailsModel from "../models/comments.model.js";
+import commentimageModel from "../models/comment-image.model.js";
 
 
 

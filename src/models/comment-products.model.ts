@@ -1,26 +1,25 @@
 import {Model, DataTypes, BuildOptions} from 'sequelize';
 import db from '../database/mysql.db.js';
-import ICommentSection from '../interfaces/ICommentSection.js';
+import ICommentProducts from '../interfaces/ICommentProducts.js';
 
-interface CommentSectionInstance extends Model<ICommentSection>, ICommentSection {}
-type CommentSectionModelStatic = typeof Model & {
-  new (values?: object, options?: BuildOptions): CommentSectionInstance;
+interface CommentProductsInstance extends Model<ICommentProducts>, ICommentProducts {}
+type CommentProductsModelStatic = typeof Model & {
+  new (values?: object, options?: BuildOptions): CommentProductsInstance;
 };
 
-export default db.define('Seccion_Comentario', {
-    id_seccion_comentario: {
+export default db.define('commentProducts', {
+    id_comment_product: {
       primaryKey: true,
       autoIncrement: true,
       type: DataTypes.STRING},
-    Usuario_id_usuario:{
+    id_user:{
       type:DataTypes.STRING,
       references:{
         model:'Usuario',
         key:'id_usuario'
       }
     },
-    Valoracion: DataTypes.NUMBER,
-    Producto_id_producto:{
+    id_product:{
         type:DataTypes.STRING,
         references:{
           model:'Producto',
@@ -30,4 +29,4 @@ export default db.define('Seccion_Comentario', {
 }, {
     freezeTableName: true,
     timestamps: false
-}) as CommentSectionModelStatic;
+}) as CommentProductsModelStatic;
