@@ -2,48 +2,34 @@ import Express, { Request, Response, NextFunction } from "express";
 import path from "path";
 import fs from "fs";
 import sequelize from "../database/mysql.db.js";
-import commentSeccionModel from "../models/comment-products.model.js";
-import commentdetailsModel from "../models/comments.model.js";
-import commentimageModel from "../models/comment-image.model.js";
-
-
+import commentProducts from "../models/comment-products.model.js";
+import comments from "../models/comments.model.js";
+import commentImages from "../models/comment-images.model.js";
 
 const createComment = async (req: Request, res: Response, next: NextFunction) => {
-    const fechaActual: Date = new Date();
-    const dia: number = fechaActual.getDate();
-    const mes: number = fechaActual.getMonth() + 1;
-    const anio: number = fechaActual.getFullYear();
-    const fechaFormateada: string = `${dia}/${mes}/${anio}`;
-
-    console.log(fechaFormateada);
-
     try {
-        const { id_usuario, comentario, valoracion } = req.body;
+        const { id_user, comment, rating } = req.body;
         const { id_product } = req.params;
-        var commentSeccion = await commentSeccionModel.findOne({
+        var _commentProduct = await commentProducts.findOne({
             where: {
-                Producto_id_producto: id_product,
-                Usuario_id_usuario: id_usuario,
+                id_product,
+                id_user,
             }
         });
-        if (!commentSeccion) {
-            commentSeccion = await commentSeccionModel.create({
-                Usuario_id_usuario: id_usuario,
-                Producto_id_producto: id_product,
-                Valoracion: valoracion,
+        if (!_commentProduct) {
+            _commentProduct = await commentProducts.create({
+                id_product, id_user
             });
         }
-        var commentdetails = await commentdetailsModel.create({
-            comentario: comentario,
-            fecha_comentario: fechaFormateada,
-            Seccion_Comentario_id_comentario: commentSeccion.id_seccion_comentario!,
+        await comments.create({
+            comment, comment_date: new Date(), id_comment_product: _commentProduct.id_comment_product!,
+            has_rating: rating
         });
-        (req.files as unknown as globalThis.Express.Multer.File[]).forEach(async (file) => {
+        (req.files as unknown as globalThis.Express.Multer.File[] || []).forEach(async (file) => {
             var id_image = path.parse(file.filename).name;
-
-            await commentimageModel.create({
-                Detalles_Comentario_idDetalles_Comentario: commentdetails.id_detalles_comentario!,
-                Imagene_comentario: id_image,
+            await commentImages.create({
+                id_comment_product: _commentProduct?.id_comment_product!,
+                comment_image: id_image
             });
         });
 
@@ -72,7 +58,6 @@ const getCommentImage = async (req: Request, res: Response, next: NextFunction) 
     }
 }
 
-
 const getAllComment = async (req: Request, res: Response, next: NextFunction) => {
 
     const { id_product } = req.params;
@@ -89,17 +74,9 @@ const getAllComment = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
-
-
 const editComment = async (req: Request, res: Response, next: NextFunction) => {
-    const fechaActual: Date = new Date();
-    const dia: number = fechaActual.getDate();
-    const mes: number = fechaActual.getMonth() + 1;
-    const anio: number = fechaActual.getFullYear();
-    const fechaFormateada: string = `${dia}/${mes}/${anio}`;
-
     try {
-        const { id_usuario, comentario } = req.body;
+        const { id_user, comment } = req.body;
         const { id_product, id_comment } = req.params;
 
         console.log(`id_product ${id_product}`);
@@ -108,68 +85,54 @@ const editComment = async (req: Request, res: Response, next: NextFunction) => {
             return res.status(400).json({ status: false, message: 'Missing required parameter(s)' });
         }
 
-        const commentSeccion = await commentSeccionModel.findOne({
-            where: {
-                Producto_id_producto: id_product,
-                Usuario_id_usuario: id_usuario,
-            }
+        const _commentProduct = await commentProducts.findOne({
+            where: { id_product, id_user }
         });
-
-        if (!commentSeccion) {
+        if (!_commentProduct) {
             return res.status(404).json({ status: false, message: 'Comment section not found' });
         }
 
-        const commentdetails = await commentdetailsModel.findOne({
-            where: {
-                id_detalles_comentario: id_comment,
-                Seccion_Comentario_id_comentario: commentSeccion.id_seccion_comentario!
-            }
+        const _comment = await comments.findOne({
+            where: { id_comment }
         });
-
-        if (!commentdetails) {
+        if (!_comment) {
             return res.status(404).json({ status: false, message: 'Comment not found' });
         }
 
-        commentdetails.comentario = comentario;
-        commentdetails.fecha_comentario = fechaFormateada;
+        _comment.comment = comment;
+        _comment.comment_date = new Date();
 
-        await commentdetails.save();
-        await commentSeccion.save();
+        await _comment.save();
 
-        res.status(200).json({ status: true });
+        res.status(200).json({ status: true, message: 'Update' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: false, message: 'Server internal error' });
     }
 }
 
-
-
 const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id_comment } = req.params;
 
-        const comment = await commentdetailsModel.findByPk(id_comment);
+        const comment = await comments.findByPk(id_comment);
 
         if (!comment) {
             return res.status(404).json({ error: 0, message: "Comment not found" });
         }
 
-        await commentimageModel.destroy({
-            where: {
-                Detalles_Comentario_idDetalles_Comentario: id_comment,
-            },
+        await commentImages.destroy({
+            where: { id_comment_product: id_comment }
         });
 
         await comment.destroy();
 
-        res.status(200).json({ error: 0, status: true });
+        res.status(200).json({ error: 0, status: true, message: "Deleted" });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 1, status: false, message: "Server internal error" });
     }
 };
-
 
 export default {
     createComment,

@@ -11,13 +11,15 @@ export default db.define('comments', {
     id_comment: {
       autoIncrement: true,
       primaryKey: true,
-      type: DataTypes.STRING},
+      type: DataTypes.NUMBER
+    },
     comment: DataTypes.STRING,
-    comment_date: DataTypes.STRING,
+    comment_date: DataTypes.DATE,
+    has_rating: DataTypes.BOOLEAN,
     id_comment_product: {
-      type:DataTypes.STRING,
+      type:DataTypes.NUMBER,
       references:{
-        model:'comment_products',
+        model:'commentProducts',
         key:'id_comment_product'
       }
     },

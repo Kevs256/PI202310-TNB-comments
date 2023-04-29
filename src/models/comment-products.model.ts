@@ -11,21 +11,10 @@ export default db.define('commentProducts', {
     id_comment_product: {
       primaryKey: true,
       autoIncrement: true,
-      type: DataTypes.STRING},
-    id_user:{
-      type:DataTypes.STRING,
-      references:{
-        model:'Usuario',
-        key:'id_usuario'
-      }
+      type: DataTypes.NUMBER
     },
-    id_product:{
-        type:DataTypes.STRING,
-        references:{
-          model:'Producto',
-          key:'id_producto'
-        }
-      }
+    id_user: DataTypes.STRING,
+    id_product: DataTypes.STRING
 }, {
     freezeTableName: true,
     timestamps: false

@@ -7,17 +7,18 @@ type CommentImageModelStatic = typeof Model & {
   new (values?: object, options?: BuildOptions): CommentImageInstance;
 };
 
-export default db.define('Imagenes_Comentario', {
+export default db.define('commentImages', {
     id_comment_image: {
       autoIncrement: true,
       primaryKey: true,
-      type: DataTypes.STRING},
+      type: DataTypes.STRING
+    },
     comment_image: DataTypes.STRING,
     id_comment_product:{
       type:DataTypes.STRING,
       references:{
-        model:'Detalles_Comentario',
-        key:'id_detalles_comentario'
+        model:'commentProducts',
+        key:'id_comment_product'
       }
     },
 }, {
